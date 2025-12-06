@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+.env
+venv/
+ENV/
+.env.*
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Database
+*.sqlite3
+*.db
+
+# Others
+*.bak
+*.swp
+*.tmp
+
+# Ignore requirements if generated
+requirements.txt.bak
+
+# Ignore OneDrive temp files
+~$*
+
+# Ignore Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
