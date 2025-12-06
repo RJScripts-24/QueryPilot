@@ -59,17 +59,26 @@ def run_mongo_query(filter_json: str):
         # 4. Summarize results in natural English
         # Try to infer the type of query and summarize accordingly
         # Example: count, list, or details
+        def format_price(order):
+            price = order.get('price', 'N/A')
+            currency = order.get('currency', 'INR')
+            if currency == 'INR':
+                return f"₹{price}"
+            else:
+                return f"{currency} {price}"
+
         if len(results) == 1:
             order = results[0]
-            summary = f"Order {order.get('order_id', '')} for {order.get('customer', 'a customer')} is a {order.get('item', 'product')} priced at ${order.get('price', 'N/A')}, status: {order.get('status', 'unknown')}."
+            summary = f"Order {order.get('order_id', '')} for {order.get('customer', 'a customer')} is a {order.get('item', 'product')} priced at {format_price(order)}, status: {order.get('status', 'unknown')}."
             return summary
         elif len(results) <= 5:
             summary_lines = []
             for order in results:
-                summary_lines.append(f"Order {order.get('order_id', '')}: {order.get('customer', 'Customer')} ordered a {order.get('item', 'product')} for ${order.get('price', 'N/A')} (Status: {order.get('status', 'unknown')})")
+                summary_lines.append(f"Order {order.get('order_id', '')}: {order.get('customer', 'Customer')} ordered a {order.get('item', 'product')} for {format_price(order)} (Status: {order.get('status', 'unknown')})")
             return "Here are the matching orders: " + "; ".join(summary_lines)
         else:
-            return f"Found {len(results)} orders matching your criteria. For example, order {results[0].get('order_id', '')} is for {results[0].get('customer', 'a customer')} ({results[0].get('item', 'product')}, ${results[0].get('price', 'N/A')}, status: {results[0].get('status', 'unknown')})."
+            order = results[0]
+            return f"Found {len(results)} orders matching your criteria. For example, order {order.get('order_id', '')} is for {order.get('customer', 'a customer')} ({order.get('item', 'product')}, {format_price(order)}, status: {order.get('status', 'unknown')})."
 
     except json.JSONDecodeError:
         return "Error: Invalid JSON format provided by the router."
