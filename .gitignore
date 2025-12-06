@@ -10,6 +10,13 @@ venv/
 ENV/
 .env.*
 
+# Secrets and environment files
+.env
+backend/.env
+secrets.json
+secrets.yaml
+secrets.env
+
 # VS Code
 .vscode/
 
