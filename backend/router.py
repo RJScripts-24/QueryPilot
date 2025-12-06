@@ -43,13 +43,13 @@ tools_schema = [
         "type": "function",
         "function": {
             "name": "run_mongo_query",
-            "description": "Query the orders database. Use this when the user asks about sales, orders, items, or prices.",
+            "description": "Query the orders database. Use this when the user asks about sales, orders, items, or prices. IMPORTANT: Always provide the filter_json parameter as a stringified JSON (not an object). For example, use '{\"price\": {\"$gt\": 500}}' not {\"price\": {\"$gt\": 500}}.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "filter_json": {
                         "type": "string",
-                        "description": "A valid MongoDB query filter in JSON format. Example: {'price': {'$gt': 500}} or {'customer': 'Alice'}. Do NOT include 'db.collection.find', just the filter object."
+                        "description": "A valid MongoDB query filter as a stringified JSON. Example: '{\"price\": {\"$gt\": 500}}' or '{\"customer\": \"Alice\"}'. Do NOT include 'db.collection.find', just the filter object as a string."
                     }
                 },
                 "required": ["filter_json"],
@@ -93,7 +93,6 @@ async def get_ai_response(user_query: str):
         for tool_call in tool_calls:
             function_name = tool_call.function.name
             function_args = json.loads(tool_call.function.arguments)
-            
             print(f"🤖 Grok decided to call: {function_name} with {function_args}")
 
             # Execute the actual Python code
@@ -118,7 +117,13 @@ async def get_ai_response(user_query: str):
             model="llama-3.3-70b-versatile",
             messages=messages
         )
-        return final_response.choices[0].message.content
+        content = final_response.choices[0].message.content
+        if not content or not str(content).strip():
+            return "Sorry, I couldn't find an answer to your question. Please try rephrasing or ask something else!"
+        return content
 
     # CASE 2: No tool needed (User just said "Hi")
-    return response_message.content
+    content = response_message.content
+    if not content or not str(content).strip():
+        return "Sorry, I didn't understand that. Could you please rephrase?"
+    return content

@@ -29,6 +29,28 @@ def run_mongo_query(filter_json: str):
         # 1. Parse the stringified JSON from Grok into a real Python Dictionary
         query_filter = json.loads(filter_json)
         print(f"🔍 Executing MongoDB Query: {query_filter}")
+
+        # 1.5. Make string equality filters case-insensitive using regex
+        def make_case_insensitive(d):
+            if isinstance(d, dict):
+                new_d = {}
+                for k, v in d.items():
+                    # If value is a string, convert to regex for case-insensitive match
+                    if isinstance(v, str):
+                        new_d[k] = {"$regex": f"^{v}$", "$options": "i"}
+                    # If value is a dict (e.g., $gt, $lt), recurse
+                    elif isinstance(v, dict):
+                        new_d[k] = make_case_insensitive(v)
+                    # If value is a list, recurse
+                    elif isinstance(v, list):
+                        new_d[k] = [make_case_insensitive(i) for i in v]
+                    else:
+                        new_d[k] = v
+                return new_d
+            return d
+
+        query_filter = make_case_insensitive(query_filter)
+
         # 2. Run the query
         results = list(orders_collection.find(query_filter, {"_id": 0}))
         # 3. Handle empty results

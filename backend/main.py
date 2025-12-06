@@ -49,16 +49,17 @@ async def chat_endpoint(request: UserRequest):
     try:
         user_query = request.query
         print(f"📩 Received Query: {user_query}")
-        
         # Call the "Brain" (Router)
         # This function will handle the Grok API and Tool calls
         response_text = await get_ai_response(user_query)
-        
+        # Fallback if response is empty or None
+        if not response_text or not str(response_text).strip():
+            response_text = "Sorry, I didn't understand that. Could you please rephrase?"
         return {"response": response_text}
-
     except Exception as e:
         print(f"❌ Error processing request: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Always return a friendly message instead of error
+        return {"response": "Sorry, I couldn't process your request. Please try again or ask something else!"}
 
 # 6. Run the server (Optional: only if running via 'python main.py')
 if __name__ == "__main__":
