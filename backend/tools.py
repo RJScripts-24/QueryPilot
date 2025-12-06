@@ -4,22 +4,21 @@ from database import orders_collection
 
 def get_weather(city: str):
     """
-    Mocks a weather API. Returns a hardcoded string based on the city.
+    Fetches real weather data from WeatherAPI.com for the given city.
     """
-    # Normalize input to handle "London", "london", "LONDON" etc.
-    city_lower = city.lower().strip()
-    # Support for alternate spellings and names
-    if "new york" in city_lower:
-        return f"The weather in {city} is 20°C and Cloudy."
-    elif "bangalore" in city_lower or "bengaluru" in city_lower:
-        return f"The weather in {city} is 28°C and Sunny."
-    elif "san francisco" in city_lower:
-        return f"The weather in {city} is 16°C with Fog."
-    elif "london" in city_lower:
-        return f"The weather in {city} is 12°C and Rainy."
-    else:
-        # Default mock response for unknown cities
-        return f"The weather in {city} is 22°C and Clear skies."
+    import requests
+    api_key = "285f4396c7bf4d38b65164750250612"
+    url = f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        location = data.get("location", {}).get("name", city)
+        temp_c = data.get("current", {}).get("temp_c", "N/A")
+        condition = data.get("current", {}).get("condition", {}).get("text", "N/A")
+        return f"The weather in {location} is {temp_c}°C and {condition}."
+    except Exception as e:
+        return f"Could not fetch weather for {city}. Error: {str(e)}"
 
 def run_mongo_query(filter_json: str):
     """
