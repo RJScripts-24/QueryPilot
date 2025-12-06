@@ -4,14 +4,14 @@ import { Shield } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="w-full px-4 sm:px-6 md:px-8 py-4 md:py-6 border-b border-white/10 relative z-20 bg-[rgba(30,27,54,0.5)] backdrop-blur-[20px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+    <header className="fixed top-0 left-0 w-full px-4 sm:px-6 md:px-8 py-4 md:py-6 border-b border-white/10 z-30 bg-[rgba(30,27,54,0.5)] backdrop-blur-[20px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gradient-to-br from-[#7C3AED] to-[#22D3EE] rounded-lg shadow-[0_0_20px_rgba(124,58,237,0.5)]">
             <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} aria-hidden="true" />
           </div>
           <h1 className="text-white tracking-wider text-sm sm:text-base md:text-lg font-bold font-sans">
-            INSTINCT AI TERMINAL
+            QueryPilot
           </h1>
         </div>
         

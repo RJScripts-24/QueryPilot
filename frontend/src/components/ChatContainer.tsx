@@ -1,6 +1,5 @@
 import { ShieldCheck, User } from 'lucide-react';
 import { LoadingIndicator } from './LoadingIndicator';
-
 export function ChatContainer() {
   return (
     <div className="space-y-6">
@@ -70,6 +69,7 @@ export function ChatContainer() {
       <div className="flex justify-start">
         <LoadingIndicator />
       </div>
+
     </div>
   );
 }

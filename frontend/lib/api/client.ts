@@ -1,6 +1,4 @@
-/**
- * API Client for backend communication
- */
+
 
 import type { UserRequest, ChatResponse, HTTPValidationError } from "../types/api";
 
@@ -18,7 +16,7 @@ export class ApiError extends Error {
 }
 
 /**
- * Sends a chat message to the backend API
+ * 
  * @param query - The user's query/message
  * @returns Promise resolving to the chat response
  * @throws ApiError if the request fails
@@ -41,7 +39,7 @@ export async function sendChatMessage(query: string): Promise<ChatResponse> {
       try {
         errorData = await response.json();
       } catch {
-        // If response is not JSON, use status text
+        
       }
 
       throw new ApiError(
@@ -58,7 +56,7 @@ export async function sendChatMessage(query: string): Promise<ChatResponse> {
       throw error;
     }
     
-    // Network or other errors
+    
     throw new ApiError(
       error instanceof Error ? error.message : "Network error occurred",
       0

@@ -16,7 +16,7 @@
 }
 
 @layer utilities {
-  /* Header animations */
+
   @keyframes pulse-ring {
     0%, 100% {
       opacity: 1;
@@ -39,7 +39,7 @@
     }
   }
 
-  /* Loading indicator animations */
+ 
   @keyframes wave {
     0%, 60%, 100% {
       transform: translateY(0);
@@ -71,7 +71,7 @@
     }
   }
 
-  /* Robot animations */
+  
   @keyframes float-robot {
     0%, 100% {
       transform: translateY(0px);
@@ -192,7 +192,7 @@
     }
   }
 
-  /* Background effects animations */
+  
   @keyframes float-up {
     0% {
       transform: translateY(0) translateX(0);
@@ -227,7 +227,7 @@
     }
   }
 
-  /* Thinking light bulb animations */
+  
   @keyframes pop-in {
     0% {
       transform: translateX(-50%) scale(0);
@@ -295,7 +295,7 @@
     }
   }
 
-  /* Input area animations */
+  
   @keyframes rotate-glow {
     from {
       transform: rotate(0deg) scale(1.1);

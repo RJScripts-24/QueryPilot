@@ -15,22 +15,20 @@ export default function Home() {
     await sendMessage(messageText);
   };
 
+  
   return (
-    <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-gradient-to-br from-[#0F0C29] to-[#1E1B36]">
+    <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-gradient-to-br from-[#0F0C29] to-[#1E1B36] pt-20 md:pt-28">
       <BackgroundEffects />
       <AnimatedRobot isThinking={isLoading} />
       <Header />
-      
       {error && (
         <ErrorAlert message={error} onDismiss={clearError} />
       )}
-
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 py-8 md:py-12 relative z-10">
         <div className="w-full max-w-[800px] space-y-6">
           <ChatContainer messages={messages} isLoading={isLoading} />
         </div>
       </main>
-      
       <InputArea 
         onSendMessage={handleSendMessage} 
         isLoading={isLoading}

@@ -27,7 +27,7 @@ export function Header() {
             fontWeight: 700,
             letterSpacing: '2px'
           }}>
-            INSTINCT AI TERMINAL
+            QueryPilot
           </h1>
         </div>
         

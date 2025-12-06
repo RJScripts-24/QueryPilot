@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Instinct AI Terminal",
+  title: "QueryPilot",
   description: "AI-powered security terminal interface",
 };
 

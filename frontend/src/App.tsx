@@ -11,7 +11,7 @@ export default function App() {
   const handleSendMessage = () => {
     setIsThinking(true);
     
-    // Simulate thinking for 3 seconds
+    
     setTimeout(() => {
       setIsThinking(false);
     }, 3000);

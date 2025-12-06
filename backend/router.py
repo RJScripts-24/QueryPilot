@@ -1,26 +1,24 @@
-# Logic to parse user text -> MongoDB Query
+
 import os
 import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# Import the actual functions from tools.py
-# (We will build tools.py next, so don't run this yet!)
+
 from tools import get_weather, run_mongo_query
 
-# Load environment variables
+
 
 load_dotenv()
 print(f"[DEBUG] GROQ_API_KEY loaded: {os.getenv('GROQ_API_KEY')}")
 
-# 1. Setup the Groq Client
+
 client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1",  # Pointing to Groq's servers
+    base_url="https://api.groq.com/openai/v1",  
 )
 
-# 2. Define the Tools (Schema)
-# This tells the LLM what functions are available and what arguments they need.
+
 tools_schema = [
     {
         "type": "function",
@@ -66,64 +64,83 @@ async def get_ai_response(user_query: str):
     3. If yes, execute the tool and send results back to Grok.
     4. Return the final natural language response.
     """
-    
-    # Message history
+    logs = []
+   
     messages = [
         {"role": "system", "content": "You are a helpful assistant. You have access to a database of orders and a weather tool. Always answer in clear, polite English."},
         {"role": "user", "content": user_query}
     ]
 
-    # First Call: Ask Groq what to do
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",  # Groq's model with tool support
-        messages=messages,
-        tools=tools_schema,
-        tool_choice="auto"  # Let Groq decide whether to use a tool or not
-    )
+    try:
+        
+        print(f"[DEBUG] Sending request to Groq with query: {user_query}")
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",  
+            messages=messages,
+            tools=tools_schema,
+            tool_choice="auto"  
+        )
+        print(f"[DEBUG] Groq response received")
+    except Exception as e:
+        print(f"[ERROR] Failed to get response from Groq: {e}")
+        return f"Sorry, there was an error communicating with the AI service: {str(e)}", logs
 
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
+    print(f"[DEBUG] Tool calls: {tool_calls}")
 
-    # CASE 1: Grok wants to use a tool
+    
     if tool_calls:
-        # Append Grok's intent to the history
+        
         messages.append(response_message)
-
-        # Loop through all tool calls (Grok might want to call multiple tools)
+        
         for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            function_args = json.loads(tool_call.function.arguments)
-            print(f"🤖 Grok decided to call: {function_name} with {function_args}")
-
-            # Execute the actual Python code
-            tool_result = ""
-            if function_name == "get_weather":
-                result = get_weather(function_args.get("city"))
-                tool_result = json.dumps({"result": result})
-            elif function_name == "run_mongo_query":
-                filter_str = function_args.get("filter_json")
-                result = run_mongo_query(filter_str)
-                tool_result = json.dumps({"result": result})
-
-            # Send the tool result back to Groq
+            try:
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+                log_entry = f"🤖 Grok called: {function_name} with {function_args}"
+                print(log_entry)
+                logs.append(log_entry)
+                tool_result = ""
+                if function_name == "get_weather":
+                    city = function_args.get("city")
+                    print(f"[DEBUG] Calling get_weather with city: {city}")
+                    result = get_weather(city)
+                    logs.append(f"Weather API result for {city}: {result}")
+                    tool_result = json.dumps({"result": result})
+                elif function_name == "run_mongo_query":
+                    filter_str = function_args.get("filter_json")
+                    logs.append(f"MongoDB Query filter: {filter_str}")
+                    result = run_mongo_query(filter_str)
+                    logs.append(f"MongoDB Query result: {result}")
+                    tool_result = json.dumps({"result": result})
+            except Exception as e:
+                print(f"[ERROR] Error processing tool call: {e}")
+                tool_result = json.dumps({"result": f"Error: {str(e)}"})
+            
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "content": tool_result
             })
+        
+        try:
+            print(f"[DEBUG] Sending tool results back to Groq")
+            final_response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages
+            )
+            content = final_response.choices[0].message.content
+            print(f"[DEBUG] Final response from Groq: {content}")
+            if not content or not str(content).strip():
+                return "Sorry, I couldn't find an answer to your question. Please try rephrasing or ask something else!", logs
+            return content, logs
+        except Exception as e:
+            print(f"[ERROR] Failed to get final response from Groq: {e}")
+            return f"Sorry, there was an error getting the final response: {str(e)}", logs
 
-        # Second Call: Get the final summary from Groq
-        final_response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages
-        )
-        content = final_response.choices[0].message.content
-        if not content or not str(content).strip():
-            return "Sorry, I couldn't find an answer to your question. Please try rephrasing or ask something else!"
-        return content
-
-    # CASE 2: No tool needed (User just said "Hi")
+    
     content = response_message.content
     if not content or not str(content).strip():
-        return "Sorry, I didn't understand that. Could you please rephrase?"
-    return content
+        return "Sorry, I didn't understand that. Could you please rephrase?", logs
+    return content, logs

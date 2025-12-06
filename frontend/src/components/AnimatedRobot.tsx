@@ -66,7 +66,7 @@ export function AnimatedRobot({ isThinking }: AnimatedRobotProps) {
   return (
     <div 
       ref={robotRef}
-      className="absolute bottom-12 left-32 z-30"
+      className="fixed bottom-12 left-32 z-30"
       style={{
         animation: isThinking ? 'think-bounce 0.5s ease-in-out infinite' : 'float-robot 4s ease-in-out infinite'
       }}

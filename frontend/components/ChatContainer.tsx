@@ -1,4 +1,6 @@
+
 "use client";
+import React from "react";
 
 import type { ChatMessage } from "@/lib/types/api";
 import { LoadingIndicator } from "./LoadingIndicator";
@@ -9,10 +11,39 @@ interface ChatContainerProps {
 }
 
 export function ChatContainer({ messages, isLoading }: ChatContainerProps) {
+  const [showLogs, setShowLogs] = React.useState(false);
+  const [logs, setLogs] = React.useState<string[]>([]);
+  const [loadingLogs, setLoadingLogs] = React.useState(false);
+
+  const fetchLogs = async () => {
+    setLoadingLogs(true);
+    try {
+      const res = await fetch("http://127.0.0.1:8000/logs");
+      const data = await res.json();
+      setLogs(data.logs || []);
+    } catch (e) {
+      setLogs(["Failed to fetch logs."]);
+    }
+    setLoadingLogs(false);
+  };
+
+  const handleCloseLogs = () => {
+    setShowLogs(false);
+  };
+
+  React.useEffect(() => {
+    const handler = () => {
+      setShowLogs(true);
+      fetchLogs();
+    };
+    window.addEventListener('showLogs', handler);
+    return () => window.removeEventListener('showLogs', handler);
+  }, []);
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {messages.length === 0 && !isLoading && (
-        <div className="flex justify-center items-center py-12">
+        <div className="flex flex-col justify-center items-center py-12">
           <p className="text-gray-400 font-sans text-sm sm:text-base">
             Start a conversation by typing a message below
           </p>
@@ -68,6 +99,60 @@ export function ChatContainer({ messages, isLoading }: ChatContainerProps) {
       {isLoading && (
         <div className="flex justify-start">
           <LoadingIndicator />
+        </div>
+      )}
+
+      {/* Command Prompt Style Logs Modal */}
+      {showLogs && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4">
+          <div className="bg-black rounded-lg shadow-2xl max-w-3xl w-full border-2 border-cyan-500 overflow-hidden">
+            {/* Command Prompt Header */}
+            <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-4 py-2 flex items-center justify-between border-b border-cyan-500">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="ml-3 text-cyan-400 font-mono text-sm font-bold">
+                  C:\QueryPilot\Backend> System Logs
+                </span>
+              </div>
+              <button
+                className="text-cyan-400 hover:text-cyan-300 font-bold text-xl px-2"
+                onClick={handleCloseLogs}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Terminal Content */}
+            <div className="bg-black p-6 max-h-96 overflow-y-auto font-mono text-sm">
+              {loadingLogs ? (
+                <div className="text-cyan-400 animate-pulse">
+                  <span className="text-green-400">$</span> Loading logs...
+                </div>
+              ) : logs.length > 0 ? (
+                <div className="space-y-2">
+                  {logs.map((log, idx) => (
+                    <div key={idx} className="text-green-400">
+                      <span className="text-cyan-400">[{new Date().toLocaleTimeString()}]</span>{" "}
+                      <span className="text-yellow-400">→</span> {log}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500">
+                  <span className="text-cyan-400">$</span> No logs available. Send a query to see backend activity.
+                </div>
+              )}
+              
+              {/* Blinking cursor */}
+              <div className="mt-2 text-green-400">
+                <span className="text-cyan-400">$</span>
+                <span className="inline-block w-2 h-4 bg-green-400 ml-1 animate-pulse"></span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -25,7 +25,7 @@ export function AnimatedRobot({ isThinking }: AnimatedRobotProps) {
 
   useEffect(() => {
     if (isThinking) {
-      // Thinking animation - look around randomly
+      
       const thinkingInterval = setInterval(() => {
         const randomHeadAngle = Math.random() * 30 - 15;
         const randomEyeX = Math.random() * 4 - 2;
@@ -42,18 +42,18 @@ export function AnimatedRobot({ isThinking }: AnimatedRobotProps) {
     } else if (robotRef.current) {
       const rect = robotRef.current.getBoundingClientRect();
       const robotCenterX = rect.left + rect.width / 2;
-      const robotCenterY = rect.top + rect.height / 3; // Head position
+      const robotCenterY = rect.top + rect.height / 3; 
 
       const deltaX = mousePosition.x - robotCenterX;
       const deltaY = mousePosition.y - robotCenterY;
       
-      // Calculate head rotation (limited to -30 to 30 degrees)
+      
       const angle = Math.atan2(deltaX, -deltaY) * (180 / Math.PI);
       const headRotation = Math.max(-30, Math.min(30, angle));
       
-      // Calculate eye position (limited movement)
+      
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-      const maxEyeMove = 3; // Maximum pixels eyes can move
+      const maxEyeMove = 3; 
       const eyeMoveX = Math.max(-maxEyeMove, Math.min(maxEyeMove, (deltaX / distance) * maxEyeMove * 2));
       const eyeMoveY = Math.max(-maxEyeMove, Math.min(maxEyeMove, (deltaY / distance) * maxEyeMove * 2));
 
@@ -182,12 +182,7 @@ export function AnimatedRobot({ isThinking }: AnimatedRobotProps) {
           />
         </div>
 
-        {/* Name tag / Label */}
-        <div className="mt-3 text-center px-3 sm:px-4 py-1.5 rounded-full bg-[rgba(30,27,54,0.8)] border border-[rgba(124,58,237,0.5)] backdrop-blur-[10px] shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-          <span className="text-xs sm:text-sm text-[#22D3EE] font-semibold font-sans shadow-[0_0_10px_rgba(34,211,238,0.5)]">
-            INSTINCT BOT
-          </span>
-        </div>
+        {}
       </div>
     </div>
   );

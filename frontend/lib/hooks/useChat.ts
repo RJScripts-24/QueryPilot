@@ -13,9 +13,7 @@ interface UseChatReturn {
   clearError: () => void;
 }
 
-/**
- * Custom hook for managing chat state and API interactions
- */
+
 export function useChat(): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +22,7 @@ export function useChat(): UseChatReturn {
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
 
-    // Add user message immediately
+   
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       text: text.trim(),
@@ -39,7 +37,7 @@ export function useChat(): UseChatReturn {
     try {
       const response = await sendChatMessage(text.trim());
       
-      // Extract response text - handle different possible response structures
+      
       const aiText = 
         response.response || 
         response.message || 
@@ -61,7 +59,7 @@ export function useChat(): UseChatReturn {
       
       setError(errorMessage);
       
-      // Optionally add error message to chat
+      
       const errorChatMessage: ChatMessage = {
         id: `error-${Date.now()}`,
         text: `Error: ${errorMessage}`,
