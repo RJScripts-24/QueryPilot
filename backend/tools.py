@@ -27,21 +27,28 @@ def run_mongo_query(filter_json: str):
     """
     try:
         # 1. Parse the stringified JSON from Grok into a real Python Dictionary
-        # Example input: '{"price": {"$gt": 500}}' -> Python Dict
         query_filter = json.loads(filter_json)
-        
         print(f"🔍 Executing MongoDB Query: {query_filter}")
-        
         # 2. Run the query
-        # We exclude '_id' because it's an ObjectId type which isn't JSON serializable by default
         results = list(orders_collection.find(query_filter, {"_id": 0}))
-        
         # 3. Handle empty results
         if not results:
             return "No orders found matching that criteria."
-            
-        # 4. Return results as a string so the LLM can read it
-        return str(results)
+
+        # 4. Summarize results in natural English
+        # Try to infer the type of query and summarize accordingly
+        # Example: count, list, or details
+        if len(results) == 1:
+            order = results[0]
+            summary = f"Order {order.get('order_id', '')} for {order.get('customer', 'a customer')} is a {order.get('item', 'product')} priced at ${order.get('price', 'N/A')}, status: {order.get('status', 'unknown')}."
+            return summary
+        elif len(results) <= 5:
+            summary_lines = []
+            for order in results:
+                summary_lines.append(f"Order {order.get('order_id', '')}: {order.get('customer', 'Customer')} ordered a {order.get('item', 'product')} for ${order.get('price', 'N/A')} (Status: {order.get('status', 'unknown')})")
+            return "Here are the matching orders: " + "; ".join(summary_lines)
+        else:
+            return f"Found {len(results)} orders matching your criteria. For example, order {results[0].get('order_id', '')} is for {results[0].get('customer', 'a customer')} ({results[0].get('item', 'product')}, ${results[0].get('price', 'N/A')}, status: {results[0].get('status', 'unknown')})."
 
     except json.JSONDecodeError:
         return "Error: Invalid JSON format provided by the router."
