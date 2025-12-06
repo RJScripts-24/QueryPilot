@@ -9,12 +9,14 @@ from dotenv import load_dotenv
 from tools import get_weather, run_mongo_query
 
 # Load environment variables
-load_dotenv()
 
-# 1. Setup the Grok (xAI) Client
+load_dotenv()
+print(f"[DEBUG] GROQ_API_KEY loaded: {os.getenv('GROQ_API_KEY')}")
+
+# 1. Setup the Groq Client
 client = OpenAI(
-    api_key=os.getenv("XAI_API_KEY"),
-    base_url="https://api.x.ai/v1",  # Pointing to Grok's servers
+    api_key=os.getenv("GROQ_API_KEY"),
+    base_url="https://api.groq.com/openai/v1",  # Pointing to Groq's servers
 )
 
 # 2. Define the Tools (Schema)
@@ -71,12 +73,12 @@ async def get_ai_response(user_query: str):
         {"role": "user", "content": user_query}
     ]
 
-    # First Call: Ask Grok what to do
+    # First Call: Ask Groq what to do
     response = client.chat.completions.create(
-        model="grok-beta",  # Or 'grok-2' depending on your API access
+        model="llama-3.3-70b-versatile",  # Groq's model with tool support
         messages=messages,
         tools=tools_schema,
-        tool_choice="auto"  # Let Grok decide whether to use a tool or not
+        tool_choice="auto"  # Let Groq decide whether to use a tool or not
     )
 
     response_message = response.choices[0].message
@@ -96,26 +98,24 @@ async def get_ai_response(user_query: str):
 
             # Execute the actual Python code
             tool_result = ""
-            
             if function_name == "get_weather":
-                tool_result = get_weather(function_args.get("city"))
-            
+                result = get_weather(function_args.get("city"))
+                tool_result = json.dumps({"result": result})
             elif function_name == "run_mongo_query":
-                # The LLM gives us a string like "{'price': {'$gt': 100}}"
-                # We pass it to our database tool
                 filter_str = function_args.get("filter_json")
-                tool_result = run_mongo_query(filter_str)
+                result = run_mongo_query(filter_str)
+                tool_result = json.dumps({"result": result})
 
-            # Send the tool result back to Grok
+            # Send the tool result back to Groq
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
-                "content": str(tool_result)
+                "content": tool_result
             })
 
-        # Second Call: Get the final summary from Grok
+        # Second Call: Get the final summary from Groq
         final_response = client.chat.completions.create(
-            model="grok-beta",
+            model="llama-3.3-70b-versatile",
             messages=messages
         )
         return final_response.choices[0].message.content

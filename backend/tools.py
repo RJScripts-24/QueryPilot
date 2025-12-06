@@ -8,10 +8,10 @@ def get_weather(city: str):
     """
     # Normalize input to handle "London", "london", "LONDON" etc.
     city_lower = city.lower().strip()
-    
+    # Support for alternate spellings and names
     if "new york" in city_lower:
         return f"The weather in {city} is 20°C and Cloudy."
-    elif "bangalore" in city_lower:
+    elif "bangalore" in city_lower or "bengaluru" in city_lower:
         return f"The weather in {city} is 28°C and Sunny."
     elif "san francisco" in city_lower:
         return f"The weather in {city} is 16°C with Fog."

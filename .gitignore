@@ -44,3 +44,127 @@ requirements.txt.bak
 
 # Ignore Jupyter Notebooks checkpoints
 .ipynb_checkpoints/
+
+###########################
+# Node.js / Next.js / Frontend
+###########################
+########################################################
+# Combined .gitignore for Python backend & Next.js frontend
+########################################################
+
+# --- Node.js / Next.js / Frontend ---
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+.pnp*
+frontend/.pnp*
+*.tsbuildinfo
+next-env.d.ts
+frontend/next-env.d.ts
+coverage/
+frontend/coverage/
+build/
+frontend/build/
+.vercel/
+frontend/.vercel/
+
+# --- Python / Backend ---
+.venv/
+venv/
+ENV/
+backend/__pycache__/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+backend/*.pyc
+backend/.env
+
+# --- Environment & Secrets ---
+.env*
+frontend/.env*
+backend/.env*
+secrets.*
+backend/secrets.*
+
+# --- Logs & Debug ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+node_modules/
+
+# --- Database ---
+*.sqlite3
+*.db
+
+# --- Miscellaneous ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+*.bak
+*.swp
+*.tmp
+.ipynb_checkpoints/
+~$*
+*.pem
+requirements.txt.bak
+
+# --- Package manager files ---
+package-lock.json
+frontend/package-lock.json
+
+frontend/node_modules/
+.next/
+frontend/.next/
+.pnp*
+frontend/.pnp*
+coverage/
+frontend/coverage/
+build/
+frontend/build/
+.vercel/
+frontend/.vercel/
+next-env.d.ts
+frontend/next-env.d.ts
+
+###########################
+# Python / Backend
+###########################
+.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+
+###########################
+# Miscellaneous
+###########################
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+*.log
+*.sqlite3
+*.db
+*.bak
+*.swp
+*.tmp
+.ipynb_checkpoints/
+~$*
+
+###########################
+# Environment & Secrets
+###########################
+.env*
+secrets.*
+backend/secrets.*
+frontend/.env*
+
+###########################
+# Ignore package manager files
+package-lock.json
+frontend/package-lock.json
